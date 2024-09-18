@@ -2,6 +2,7 @@
 Yarn Spinner is licensed to you under the terms found in the file LICENSE.md.
 */
 
+using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.AssetImporters;
@@ -9,6 +10,7 @@ using UnityEngine;
 using System.Linq;
 using Yarn.Compiler;
 using System.IO;
+using Object = UnityEngine.Object;
 
 #if USE_UNITY_LOCALIZATION
 using UnityEditor.Localization;
@@ -601,6 +603,13 @@ namespace Yarn.Unity.Editor
                     }
 
                     var lineEntry = table.AddEntry(lineID, stringInfo.text);
+
+                    if (stringInfo.text.Contains(':')) // has speaker?
+                    {
+                        string speaker = stringInfo.text[..stringInfo.text.IndexOf(':')].Trim().ToLower();
+                        Array.Resize(ref stringInfo.metadata, stringInfo.metadata.Length + 1);
+                        stringInfo.metadata[^1] = $"speaker:{speaker}";
+                    }
 
                     lineEntry.SharedEntry.Metadata.AddMetadata(new UnityLocalization.LineMetadata
                     {
