@@ -589,33 +589,17 @@ namespace Yarn.Unity.Editor
                     var lineID = entry.Key;
                     var stringInfo = entry.Value;
 
-                    var existingEntry = table.GetEntry(lineID);
-
-                    if (existingEntry != null)
-                    {
-                        var existingSharedMetadata = existingEntry.SharedEntry.Metadata.GetMetadata<UnityLocalization.LineMetadata>();
-
-                        if (existingSharedMetadata != null)
-                        {
-                            existingEntry.SharedEntry.Metadata.RemoveMetadata(existingSharedMetadata);
-                            table.MetadataEntries.Remove(existingSharedMetadata);
-                        }
-                    }
-
                     var lineEntry = table.AddEntry(lineID, stringInfo.text);
-
-                    if (stringInfo.text.Contains(':')) // has speaker?
+                    UnityLocalization.LineMetadata sharedMetadata = lineEntry.SharedEntry.Metadata
+                        .GetMetadata<UnityLocalization.LineMetadata>();
+                    if (sharedMetadata == null)
                     {
-                        string speaker = stringInfo.text[..stringInfo.text.IndexOf(':')].Trim().ToLower();
-                        Array.Resize(ref stringInfo.metadata, stringInfo.metadata.Length + 1);
-                        stringInfo.metadata[^1] = $"speaker:{speaker}";
+                        sharedMetadata = new UnityLocalization.LineMetadata();
+                        lineEntry.SharedEntry.Metadata.AddMetadata(sharedMetadata);
                     }
 
-                    lineEntry.SharedEntry.Metadata.AddMetadata(new UnityLocalization.LineMetadata
-                    {
-                        nodeName = stringInfo.nodeName,
-                        tags = RemoveLineIDFromMetadata(stringInfo.metadata).ToArray(),
-                    });
+                    sharedMetadata.nodeName = stringInfo.nodeName;
+                    sharedMetadata.tags = RemoveLineIDFromMetadata(stringInfo.metadata).ToArray();
                 }
 
                 // We've made changes to the table, so flag it and its shared
