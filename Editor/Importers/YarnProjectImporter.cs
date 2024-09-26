@@ -600,6 +600,14 @@ namespace Yarn.Unity.Editor
 
                     sharedMetadata.nodeName = stringInfo.nodeName;
                     sharedMetadata.tags = RemoveLineIDFromMetadata(stringInfo.metadata).ToArray();
+
+                    // this allows us to reference the original CharacterName from the Line, ignoring its translation.
+                    if (stringInfo.text.Contains(':'))
+                    {
+                        string speaker = stringInfo.text[..stringInfo.text.IndexOf(':')].Trim().ToLower();
+                        Array.Resize(ref sharedMetadata.tags, sharedMetadata.tags.Length + 1);
+                        sharedMetadata.tags[^1] = $"speaker:{speaker}";
+                    }
                 }
 
                 // We've made changes to the table, so flag it and its shared
