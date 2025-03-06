@@ -12,6 +12,41 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Removed
 
+## [2.5.0] 2024-12-16
+
+### Added
+- `DialogueRunner.AddCommandHandler` and `DialogueRunner.AddFunction` now validate that the provided names contain no spaces.
+- `DialogueRunner.AddCommandHandler` now supports methods whose last parameter is an array of strings.
+  - This allows for commands with a variable list of parameters. For example, consider the following method:
+    ```csharp
+    void LogStrings(int a, string[] remainder) {
+      Debug.Log($"a = {a}, remainder={string.Join(",", remainder)}");
+    }
+    ```
+    This method can be registered as a Yarn command:
+    ```csharp
+    dialogueRunner.AddCommandHandler<int, string[]>("my_command", LogStrings);
+    ```
+    And called from Yarn Spinner:
+    ```
+    // logs "a = 42, remainder=this,is,pretty,great"
+    <<my_command 42 this is pretty great>> 
+    ```
+    > [!NOTE]
+    > Array parameters are required to be string arrays, and are required to be the last parameter of the method.
+- Yarn Spinner's XML documentation is now included in the distribution.
+
+### Changed
+
+- Fixed an issue where, on Windows, projects would fail to automatically update when a file that belonged to them was created or edited.
+- Fixed an issue where Unity Localization `rid` values would change on reimport when they didn't have to.
+- Fixed an issue where a `[pause/]` marker at the start of the line would cause all pauses to not work ([@iatenothingbutriceforthreedays](https://github.com/YarnSpinnerTool/YarnSpinner-Unity/pull/291))
+- Inspector-exposed fields on `LineView` are now public.
+- Fixed an issue where a `.meta` file was causing warnings to appear in Unity on import. ([@Colbydude](https://github.com/YarnSpinnerTool/YarnSpinner-Unity/pull/294))
+- `YarnProjectImporter.GenerateStringsTable` is now public.
+- Yarn Projects now allow choosing more specific cultures (for example 'pt-BR' and 'en-AU' rather than simply 'pt' and 'en') as their base language.
+- Fixed a issue where `AudioLineProvider` would throw an exception if an asset was already loaded and was requested a second time.
+
 ## [2.4.2] 2024-02-24
 
 ### Added
