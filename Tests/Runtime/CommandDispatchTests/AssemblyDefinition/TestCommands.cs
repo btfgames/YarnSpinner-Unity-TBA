@@ -11,13 +11,13 @@ namespace Yarn.Unity.Tests
 
     public class TestCommands : MonoBehaviour
     {
-        [YarnFunction("testExternalAssemblyFunction")]
+        //[YarnFunction("testExternalAssemblyFunction")]
         public static int CoolFunction()
         {
             return 42;
         }
 
-        [YarnCommand("testExternalAssemblyCommand")]
+        //[YarnCommand("testExternalAssemblyCommand")]
         public static void CoolCommand()
         {
             Debug.Log($"success");
