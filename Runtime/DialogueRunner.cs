@@ -1098,7 +1098,15 @@ namespace Yarn.Unity
             }
             
             CurrentLine = null;
-            Dialogue.Continue();
+            try
+            {
+                Dialogue.Continue();
+            } catch (InvalidOperationException e)
+            {
+                Debug.LogWarning("[Dialogue Runner] " + e.Message, this);
+                IsDialogueRunning = false;
+                Dialogue.Stop();
+            }
         }
 
         /// <summary>
