@@ -291,6 +291,8 @@ namespace Yarn.Unity
             }
 
             // Stop any processes that might be running already
+            StopContinueWhenLinesAvailable();
+
             foreach (var dialogueView in dialogueViews)
             {
                 if (dialogueView == null || dialogueView.isActiveAndEnabled == false) 
@@ -329,11 +331,25 @@ namespace Yarn.Unity
                 // The line provider isn't ready to give us our lines
                 // yet. We need to start a coroutine that waits for
                 // them to finish loading, and then runs the dialogue.
-                StartCoroutine(ContinueDialogueWhenLinesAvailable());
+                continueWhenLinesAvailableCoroutine = StartCoroutine(ContinueDialogueWhenLinesAvailable());
             }
             else
             {
                 ContinueDialogue();
+            }
+        }
+
+        // TBA: only one pending "continue when lines are available" may exist at a time.
+        // Without this, starting several dialogues while lines are still loading stacks up coroutines
+        // that all call Continue() on the same (newest) node once lines are ready.
+        private Coroutine continueWhenLinesAvailableCoroutine;
+
+        private void StopContinueWhenLinesAvailable()
+        {
+            if (continueWhenLinesAvailableCoroutine != null)
+            {
+                StopCoroutine(continueWhenLinesAvailableCoroutine);
+                continueWhenLinesAvailableCoroutine = null;
             }
         }
 
@@ -344,6 +360,8 @@ namespace Yarn.Unity
             {
                 yield return null;
             }
+
+            continueWhenLinesAvailableCoroutine = null;
 
             // And then run our dialogue.
             ContinueDialogue();
@@ -363,6 +381,7 @@ namespace Yarn.Unity
         /// </summary>
         public void Stop()
         {
+            StopContinueWhenLinesAvailable();
             IsDialogueRunning = false;
             Dialogue.Stop();
         }
